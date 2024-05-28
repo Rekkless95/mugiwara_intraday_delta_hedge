@@ -6,16 +6,17 @@ def pre_process(file_name):
     # Read csv data and keep selected columns
     raw_data = pd.read_csv(file_name)
 
-    call_raw_columns = [' [QUOTE_DATE]', ' [EXPIRE_DATE]', ' [STRIKE]', ' [C_BID]', ' [C_ASK]', ' [C_VOLUME]', ' [C_IV]', ' [C_DELTA]', ' [C_GAMMA]', ' [C_VEGA]', ' [C_THETA]', ' [C_RHO]']
+    call_raw_columns = [' [QUOTE_DATE]', ' [EXPIRE_DATE]', ' [STRIKE]', ' [UNDERLYING_LAST]', ' [C_BID]', ' [C_ASK]', ' [C_VOLUME]', ' [C_IV]', ' [C_DELTA]', ' [C_GAMMA]', ' [C_VEGA]', ' [C_THETA]', ' [C_RHO]']
     call_data = raw_data.copy()
     call_data = call_data[call_raw_columns]
     # Rename columns
-    columns = ['Date', 'Maturity', 'Strike', 'Bid', 'Ask', 'Volume', 'Implied Vol', 'Delta', 'Gamma', 'Vega', 'Theta', 'Rho']
+    columns = ['Date', 'Maturity', 'Strike', 'Spot', 'Bid', 'Ask', 'Volume', 'Implied Vol', 'Delta', 'Gamma', 'Vega', 'Theta', 'Rho']
     call_data.columns = columns
     # Casting call_data
     call_data['Date'] = pd.to_datetime(call_data['Date'])
     call_data['Maturity'] = pd.to_datetime(call_data['Maturity'])
     call_data.loc[:, 'Strike'] = pd.to_numeric(call_data['Strike'], errors='coerce')
+    call_data.loc[:, 'Spot'] = pd.to_numeric(call_data['Spot'], errors='coerce')
     call_data.loc[:, 'Bid'] = pd.to_numeric(call_data['Bid'], errors='coerce')
     call_data.loc[:, 'Ask'] = pd.to_numeric(call_data['Ask'], errors='coerce')
     call_data.loc[:, 'Volume'] = pd.to_numeric(call_data['Volume'], errors='coerce')
@@ -27,16 +28,17 @@ def pre_process(file_name):
     call_data.loc[:, 'Rho'] = pd.to_numeric(call_data['Rho'], errors='coerce')
     call_data['Type'] = [1] * len(call_data)
 
-    call_raw_columns = [' [QUOTE_DATE]', ' [EXPIRE_DATE]', ' [STRIKE]', ' [P_BID]', ' [P_ASK]', ' [P_VOLUME]', ' [P_IV]', ' [P_DELTA]', ' [P_GAMMA]', ' [P_VEGA]', ' [P_THETA]', ' [P_RHO]']
+    call_raw_columns = [' [QUOTE_DATE]', ' [EXPIRE_DATE]', ' [STRIKE]', ' [UNDERLYING_LAST]', ' [P_BID]', ' [P_ASK]', ' [P_VOLUME]', ' [P_IV]', ' [P_DELTA]', ' [P_GAMMA]', ' [P_VEGA]', ' [P_THETA]', ' [P_RHO]']
     put_data = raw_data.copy()
     put_data = put_data[call_raw_columns]
     # Rename columns
-    columns = ['Date', 'Maturity', 'Strike', 'Bid', 'Ask', 'Volume', 'Implied Vol', 'Delta', 'Gamma', 'Vega', 'Theta', 'Rho']
+    columns = ['Date', 'Maturity', 'Strike', 'Spot', 'Bid', 'Ask', 'Volume', 'Implied Vol', 'Delta', 'Gamma', 'Vega', 'Theta', 'Rho']
     put_data.columns = columns
     # Casting put_data
     put_data['Date'] = pd.to_datetime(put_data['Date'])
     put_data['Maturity'] = pd.to_datetime(put_data['Maturity'])
     put_data.loc[:, 'Strike'] = pd.to_numeric(put_data['Strike'], errors='coerce')
+    put_data.loc[:, 'Spot'] = pd.to_numeric(put_data['Strike'], errors='coerce')
     put_data.loc[:, 'Bid'] = pd.to_numeric(put_data['Bid'], errors='coerce')
     put_data.loc[:, 'Ask'] = pd.to_numeric(put_data['Ask'], errors='coerce')
     put_data.loc[:, 'Volume'] = pd.to_numeric(put_data['Volume'], errors='coerce')
@@ -74,9 +76,10 @@ def process_files(folder_path, target_path):
         df.to_csv(output_file_path, index=False)
         print(f"Processed file saved: {output_file_path}")
 
+if __name__ == '__main__':
 
-# Example usage:
-folder_path = r'X:\Main Folder\Options Data\QQQ\Raw'
-target_path = r'X:\Main Folder\Options Data\QQQ\Pre Processed'
+    # Example usage:
+    folder_path = r'X:\Main Folder\Data\Options\QQQ\Raw'
+    target_path = r'X:\Main Folder\Data\Options\QQQ\Pre Processed'
 
-process_files(folder_path, target_path)
+    process_files(folder_path, target_path)
