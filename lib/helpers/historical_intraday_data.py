@@ -4,7 +4,7 @@ import os
 import yfinance as yf
 
 
-def get_intraday_data(symbol, api_key, start_date, end_date, frequency):
+def get_intraday_data(symbol, start_date, end_date, frequency='daily', api_key='MZZGM21KNW4PYVEG'):
     """
     Get intraday OHLC and volume data for a symbol from Alpha Vantage.
 
@@ -53,15 +53,15 @@ def get_intraday_data(symbol, start_date, end_date, interval):
     return data
 
 # Define symbol (QQQ), start date, and end date
-symbol = '^VXN'
+symbol = 'UVXY'
 start_date = '2010-01-01'
-end_date = '2023-12-31'
+end_date = '2024-05-25'
 interval = '1d'
 
 dir_path = r'X:\Main Folder\Options Data'
 dir_path = os.path.join(dir_path, symbol, 'spot')
 
-dir_path = r'X:\Main Folder\Options Data\QQQ\spot'
+dir_path = r'X:\Main Folder\Data\Spot'
 
 
 # Get 1-hour intraday data
@@ -69,33 +69,7 @@ intraday_data = get_intraday_data(symbol, start_date, end_date, interval)
 print("Successfully retrieved intraday data:")
 print(intraday_data)
 # Save the data to a CSV file
-file_name = f'{symbol}_intraday_{interval}.csv'
+file_name = f'{symbol} Daily.csv'
 file_path = os.path.join(dir_path, file_name)
 intraday_data.to_csv(file_path)
-print(f"Intraday data saved to {symbol}_intraday_{interval}.csv")
-
-
-# # Set your Alpha Vantage API key
-# api_key = 'MZZGM21KNW4PYVEG'
-#
-# # Define symbol (QQQ), start date, end date, and frequency
-# symbol = 'QQQ'
-# start_date = '2010-01-01'
-# end_date = '2023-12-31'  # Assuming you want data for one day
-# frequency = 'daily'
-# dir_path = r'X:\Main Folder\Options Data'
-# dir_path = os.path.join(dir_path, symbol, 'spot')
-#
-# # Get intraday data
-# try:
-#     intraday_data = get_intraday_data(symbol, api_key, start_date, end_date, frequency)
-#     print("Successfully retrieved intraday data:")
-#     print(intraday_data)
-#     # Save the data to a CSV file
-#     file_name = f'{symbol}_intraday_{frequency}.csv'
-#     file_path = os.path.join(dir_path, file_name)
-#     intraday_data.to_csv(file_path)
-#     print(f"Intraday data saved to {symbol}_intraday_{frequency}.csv")
-# except Exception as e:
-#     print("Error:", e)
-
+print(f"Intraday data saved to {file_name}")
