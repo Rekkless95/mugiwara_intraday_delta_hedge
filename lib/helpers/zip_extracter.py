@@ -1,6 +1,7 @@
 import os
 import py7zr
 
+from lib.helpers.preprocess_raw_data import pre_process, process_files
 
 def extract_7z_files(path_zip, path_target):
     # Create the target directory if it doesn't exist
@@ -40,9 +41,15 @@ def txt_to_csv(path_folder):
             os.remove(old_path)
 
 
-path_zip = r'X:\Main Folder\Options Data\QQQ\Zip'
-path_target = r'X:\Main Folder\Options Data\QQQ\Raw'
 
-extract_7z_files(path_zip, path_target)
+# Example usage:
+if __name__ == '__main__':
+    dir_path = r'X:\Main Folder\Data\Options'
 
-txt_to_csv(path_target)
+    ticker = 'SPX'
+
+    extract_7z_files(os.path.join(dir_path, ticker, 'Zip'), os.path.join(dir_path, ticker, 'Raw'))
+
+    txt_to_csv(os.path.join(dir_path, ticker, 'Raw'))
+
+    process_files(os.path.join(dir_path, ticker, 'Raw'), os.path.join(dir_path, ticker, 'Pre Processed'))
