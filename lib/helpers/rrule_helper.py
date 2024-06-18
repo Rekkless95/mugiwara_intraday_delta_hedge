@@ -1,7 +1,8 @@
 from dateutil import rrule
+import pytz
+ny_tz = pytz.timezone('America/New_York')
 
-
-def get_roll_dates(rules, calendar):
+def get_roll_dates(rules, calendar, close_time='16:00'):
     # Extract rule parameters
     freq = rules['freq']
     byday = rules.get('byday', None)
@@ -21,7 +22,7 @@ def get_roll_dates(rules, calendar):
         dtstart=start_date,
         until=end_date
     )
-
+    recurrence_rule = [dt.astimezone(ny_tz).replace(hour=int(close_time.split(":")[0]), minute=int(close_time.split(":")[1])) for dt in recurrence_rule]
     # Filter the calendar based on the recurrence rule
     filtered_dates = [dt for dt in calendar if dt in recurrence_rule]
 

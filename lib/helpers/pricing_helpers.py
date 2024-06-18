@@ -1,15 +1,15 @@
 from numba import jit
 import math
 
-NUM_DAYS_PER_YEAR = 252
+NUM_DAYS_PER_YEAR = 365
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def pdf(x):
     return math.exp(-0.5 * x ** 2) / math.sqrt(2 * math.pi)
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def cdf(x):
     # Constants
     a1 = 0.254829592
@@ -33,7 +33,7 @@ def cdf(x):
     return 0.5 * (1.0 + sign * y)
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def d1_d2(spot, strike, maturity, rate, div, vol):
     maturity = maturity / NUM_DAYS_PER_YEAR
     d1 = (math.log(spot / strike) + (rate - div + 0.5 * vol ** 2) * maturity) / (vol * math.sqrt(maturity))
@@ -41,7 +41,7 @@ def d1_d2(spot, strike, maturity, rate, div, vol):
     return d1, d2
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def price_bs(spot, strike, maturity, rate, div, vol, op_type):
     maturity = maturity / NUM_DAYS_PER_YEAR
     d1, d2 = d1_d2(spot, strike, maturity, rate, div, vol)
@@ -50,7 +50,7 @@ def price_bs(spot, strike, maturity, rate, div, vol, op_type):
     return _price
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def delta(spot, strike, maturity, rate, div, vol, op_type):
     maturity = maturity / NUM_DAYS_PER_YEAR
     d1, d2 = d1_d2(spot, strike, maturity, rate, div, vol)
@@ -59,34 +59,43 @@ def delta(spot, strike, maturity, rate, div, vol, op_type):
     return _delta
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def gamma(spot, strike, maturity, rate, div, vol, op_type):
     maturity = maturity / NUM_DAYS_PER_YEAR
-    d1, d2 = d1_d2(spot, strike, maturity, rate, vol)
+    d1, d2 = d1_d2(spot, strike, maturity, rate, div, vol)
     _gamma = (pdf(d1) * math.exp(-div * maturity) / spot / math.sqrt(maturity) / vol) * (vol > 1e-10)
     return _gamma
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def vega(spot, strike, maturity, rate, div, vol, op_type):
     maturity = maturity / NUM_DAYS_PER_YEAR
-    d1, d2 = d1_d2(spot, strike, maturity, rate, vol)
+    d1, d2 = d1_d2(spot, strike, maturity, rate, div, vol)
     _vega = pdf(d1) * spot * math.exp(-div * maturity) * math.sqrt(maturity)
     return _vega
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def theta(spot, strike, maturity, rate, div, vol, op_type):
     maturity = maturity / NUM_DAYS_PER_YEAR
-    d1, d2 = d1_d2(spot, strike, maturity, rate, vol)
+    d1, d2 = d1_d2(spot, strike, maturity, rate, div, vol)
     typefac = 2.0 * op_type - 1.0
-    _theta = -math.sqrt(-div * maturity) * spot * pdf(d1) * vol / (2 * math.sqrt(maturity)) - \
+    _theta = -math.exp(-div * maturity) * spot * pdf(d1) * vol / (2 * math.sqrt(maturity)) - \
              typefac * rate * strike * math.exp(-rate * maturity) * cdf(typefac * d2) + \
-             typefac * div * spot * math.sqrt(-div * maturity) * cdf(typefac * d1)
+             typefac * div * spot * math.exp(-div * maturity) * cdf(typefac * d1)
     return _theta / NUM_DAYS_PER_YEAR
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
+def rho(spot, strike, maturity, rate, div, vol, op_type):
+    maturity = maturity / NUM_DAYS_PER_YEAR
+    d1, d2 = d1_d2(spot, strike, maturity, rate, div, vol)
+    typefac = 2.0 * op_type - 1.0
+    _rho = typefac * strike * maturity * math.exp(-rate * maturity) * cdf(typefac * d2)
+    return _rho
+
+
+# @jit(nopython=True)
 def implied_vol(spot, strike, maturity, rate, div, price, op_type, low_vol=0.0, high_vol=2.0, max_iter=20, max_error=0.01):
     maturity = maturity / NUM_DAYS_PER_YEAR
     n = 1
